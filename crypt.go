@@ -22,6 +22,8 @@ type settings struct {
   outputPath string
   cipher string
   args []string
+  //caesar flags
+  printAll bool
 }
 
 func printStatus(world settings, inputText string, outputText string) {
@@ -69,26 +71,29 @@ func shift(r rune, shift int) rune {
   return r
 }
 
-func caesarEncrypt(inputText string, args []string) string {
-  n, err := strconv.Atoi(args[0])
-  check(err)
+func caesarEncrypt(inputText string, n int) string {
   return strings.Map(func(r rune) rune {
     return shift(r, n)
   }, inputText)
 }
 
-func caesarDecrypt(inputText string, args []string) string {
-  n, err := strconv.Atoi(args[0])
-  check(err)
-  return string(n)
+func caesarDecrypt(inputText string) string {
+  i := 0
+  for (i < 26) {
+    fmt.Println(caesarEncrypt(inputText, i))
+    i = i + 1
+  }
+  return ""
 }
 
 func process(inputText string, world settings) string {
   if (world.cipher == "caesar"){
     if (world.encrypting) {
-      return caesarEncrypt(inputText, world.args)
+      n, err := strconv.Atoi(world.args[0])
+      check(err)
+      return caesarEncrypt(inputText, n)
     } else if (world.decrypting) {
-      return caesarDecrypt(inputText, world.args)
+      return caesarDecrypt(inputText)
     }
   } else {
     return "no such cipher"
@@ -116,6 +121,7 @@ func main() {
   world.existsInputPath  = (*inputPath != "")
   world.existsOutputPath = (*outputPath != "")
   world.args             = getopt.Args()
+
 
   inputTextBytes, inputTextErr := ioutil.ReadFile(*inputPath)
   check(inputTextErr)
