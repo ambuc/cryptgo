@@ -1,6 +1,5 @@
 package main
 
-import "flag"
 import "fmt"
 import "io/ioutil"
 import "strings"
@@ -20,12 +19,12 @@ type sett struct {
   existsOutputPath bool
   inputPath string
   outputPath string
-  method string
+  cipher string
 }
 
 func printStatus(settings sett, inputText string, outputText string) {
   fmt.Println("")
-  fmt.Println("    method ::", settings.method)
+  fmt.Println("    cipher ::", settings.cipher)
 
   //print coding status
   if settings.encrypting {
@@ -56,40 +55,36 @@ func printStatus(settings sett, inputText string, outputText string) {
 
 func main() {
 
-  //read encode/decode pointer flag
-  encryptingPtr := flag.Bool("e", false, "encode? false by default")
-  decryptingPtr := flag.Bool("d", false, "decode? true by default")
-  quietPtr      := flag.Bool("q", false, "quiet? false by default")
+  encryptingFlag := getopt.BoolLong("encrypt", 'e', "encrypting?")
+  decryptingFlag := getopt.BoolLong("decrypt", 'd', "decrypting?")
+  quietFlag      := getopt.BoolLong("quiet", 'q', "quiet?")
+  inputPath      := getopt.StringLong("inputpath", 'i', "path to input file")
+  outputPath     := getopt.StringLong("outputpath",'o', "path to output file")
+  cipherPtr      := getopt.StringLong("cipher", 'c', "which cipher to use")
 
-  //read input/outut path strings
-  var  inputPath string; flag.StringVar( &inputPath, "i", "", "path to input file" )
-  var outputPath string; flag.StringVar(&outputPath, "o", "", "path to output file")
-
-  flag.Parse()
+  getopt.Parse()
 
   settings := sett{}
-  settings.encrypting = *encryptingPtr
-  settings.decrypting = *decryptingPtr
-  settings.method = flag.Args()[0]
-  settings.inputPath = inputPath
-  settings.outputPath = outputPath
-  settings.existsInputPath = (inputPath != "")
-  settings.existsOutputPath = (outputPath != "")
+  settings.encrypting = *encryptingFlag
+  settings.decrypting = *decryptingFlag
+  settings.cipher = *cipherPtr
+  settings.inputPath = *inputPath
+  settings.outputPath = *outputPath
+  settings.existsInputPath = (*inputPath != "")
+  settings.existsOutputPath = (*outputPath != "")
 
-
-  //print inputPath and get inputText
-  inputTextBytes, inputTextErr := ioutil.ReadFile(inputPath)
+  inputTextBytes, inputTextErr := ioutil.ReadFile(*inputPath)
   check(inputTextErr)
   inputText := string(inputTextBytes)
 
   outputText := "whatever, man"
 
   if (settings.existsOutputPath) {
-    err := ioutil.WriteFile(outputPath, []byte(outputText), 0644)
+    err := ioutil.WriteFile(*outputPath, []byte(outputText), 0644)
     check(err)
   }
 
-  if (!*quietPtr){
+  if (!*quietFlag){
     printStatus(settings, inputText, outputText)
   }
 

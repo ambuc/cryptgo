@@ -6,8 +6,8 @@
 ```
  -i --input  <inputFile.txt>
  -o --output <outputFile.txt>
- -e --encode
- -d --decode
+ -e --encrypt
+ -d --decrypt
  -q --quiet
 ```
 `-o` is optional -- it should print to terminal by default.
