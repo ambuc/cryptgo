@@ -1,12 +1,14 @@
 # cryptgo
 ##cryptography package written in go
 
+
 **Tenative flagset**:
 ```
  -i --input  <inputFile.txt>
  -o --output <outputFile.txt>
  -e --encode
  -d --decode
+ -q --quiet
 ```
 `-o` is optional -- it should print to terminal by default.
 ##Caesar Cipher
@@ -22,3 +24,10 @@ decoding could be performed
 ./crypt -d caesar --print-all -i plain.txt
 ./crypt -d caesar --dict-attack -i plain.txt
 ```
+
+##Dependencies
+Requires [`getopt`](https://godoc.org/github.com/pborman/getopt).
+```
+go get github.com/pborman/getopt
+```
+
