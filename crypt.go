@@ -3,6 +3,7 @@ package main
 import "flag"
 import "fmt"
 import "io/ioutil"
+import "strings"
 
 func check(e error) {
   if e != nil {
@@ -35,8 +36,26 @@ func main() {
 
   //print inputPath and get inputText
   fmt.Println(" inputPath ::", inputPath)
-  inputText, inputTextErr := ioutil.ReadFile(inputPath)
+  if (outputPath != "") {
+    fmt.Println("outputPath ::", outputPath)
+  }
+  inputTextBytes, inputTextErr := ioutil.ReadFile(inputPath)
   check(inputTextErr)
+  inputText := string(inputTextBytes)
 
-  fmt.Print(string(inputText))
+  fmt.Println(" inputText ::", strings.TrimSpace(inputText))
+
+  outputText := "whatever, man"
+
+  fmt.Println("outputText ::", outputText)
+
+  if (outputPath != "") {
+    fmt.Println("output printed to", outputPath)
+    err := ioutil.WriteFile(outputPath, []byte(outputText), 0644)
+    check(err)
+  } else {
+    fmt.Println("Output path not defined, printing output:")
+    fmt.Println(outputText)
+  }
+
 }
