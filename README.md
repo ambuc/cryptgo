@@ -1,24 +1,47 @@
 # cryptgo
 ##cryptography package written in go
 
-**Tenative flagset**:
+
+##Usage:
+
 ```
- -i --input  <inputFile.txt>
- -o --output <outputFile.txt>
- -e --encode
- -d --decode
+ ./cryptgo -i input.txt -e -c caesar 5
+                        -d
+ ./cryptgo --inputpath input.txt --encrypt --cipher caesar 5
+                                 --decrypt
+ ./cryptgo -i=input.txt -o=output.txt -e -c=caesar 5
+ ./cryptgo--inputpath=input.txt --outputpath=output.txt --encrypt --cipher=caesar 5
+
+Options:
+  -e --encrypt            Boolean, true if encrypting the input file.
+  -d --decrypt            Boolean, true if decrypting the input file 
+  -i --inputpath=<path>   Path to the input. 
+  -o --outputpath=<path>  Path to the output file. Output is printed to the shell
+                          by default, but can be directed into a file.
+  -c --cipher=<cipher>    Name of encryption/decryption method used.
+             =caesar <n>  Caesar ciphers require a shift on encryption.
+  -h --hint=<hint>        Hint for the decrypter, varies across ciphers [optional]
 ```
-`-o` is optional -- it should print to terminal by default.
+
 ##Caesar Cipher
+Decryption has three hints available:
 ```
-./crypt -e caesar +5 -i plain.txt -o cipher.txt
-./crypt -e caesar +5 -i plain.txt -o cipher.txt
-./crypt -d caesar    -i plain.txt -o cipher.txt
+ ./cryptgo --input input.txt --decrypt --cipher caesar 5 --hint brute-force
+ ./cryptgo --input input.txt --decrypt --cipher caesar 5 --hint analyze
+ ./cryptgo --input input.txt --decrypt --cipher caesar 5 --hint analyze-verbose
 ```
-decoding could be performed 
- - with `--print-all` (which prints all 26)
- - or with default, `--dict-attack`
+
+##Installation
 ```
-./crypt -d caesar --print-all -i plain.txt
-./crypt -d caesar --dict-attack -i plain.txt
+git clone https://github.com/ambuc/cryptgo.git
+cd cryptgo
+go build
+./cryptgo ...
 ```
+
+##Dependencies
+Requires [`getopt`](https://godoc.org/github.com/pborman/getopt).
+```
+go get github.com/pborman/getopt
+```
+
