@@ -4,13 +4,10 @@ import "fmt"
 import "io/ioutil"
 import "strings"
 import "github.com/pborman/getopt"
-import "strconv"
 import "errors"
-//import "reflect"
 
 func check(e error) {
   if e != nil {
-    //    fmt.Println(e)
     panic(e)
   } 
 }
@@ -30,15 +27,16 @@ type settings struct {
 
 func checkWorld(world settings) (bool, error) {
   if(!world.existsInputPath){
-    return false, errors.New("no input supplied. try --inputpath /path/to/input.txt")
+    return false, errors.New("No input supplied. Try `... --inputpath /path/to/input.txt`")
   }
-
   if(!world.encrypting && !world.decrypting){
-    return false, errors.New("neither encrypting nor decrypting. try --encrypt or --decrypt")
+    return false, errors.New("Neither encrypting nor decrypting. Try --encrypt or --decrypt")
   }
-
+  if(world.encrypting && world.decrypting){
+    return false, errors.New("Both encrypting and decrypting. Try --encrypt or --decrypt")
+  }
   if(!world.existsCipher){
-    return false, errors.New("No cipher defined. Try --cipher caesar")
+    return false, errors.New("No cipher defined. Try `... --cipher caesar`")
   }
 
   return true, nil
@@ -53,7 +51,9 @@ func printWorld(world settings, inputText string, outputText string) {
     fmt.Println("    status :: encrypting")
   } else if world.decrypting {
     fmt.Println("    status :: decrypting")
-    fmt.Println("      hint ::", world.hint)
+    if (world.hint != "") {
+      fmt.Println("      hint ::", world.hint)
+    }
   } else {
     fmt.Println("    status :: neither encrypting nor decryptinng")
   }
@@ -72,51 +72,6 @@ func printWorld(world settings, inputText string, outputText string) {
   }
 
   fmt.Println("")
-}
-
-func shift(r rune, shift int) rune {
-  //fmt.Println(string(r), r, int(r)+shift, string(int(r)+shift))
-  if( 65<=r && r<=90 ) {
-    return rune((((int(r) - 65 ) + shift) % 26) + 65)
-  }
-  if( 97<=r && r<=122 ) {
-    return rune((((int(r) - 97 ) + shift) % 26) + 97)
-  }
-  return r
-}
-
-func caesarShift(inputText string, n int) string {
-  return strings.Map( func (r rune) rune { return shift(r, n) }, inputText)
-}
-
-func caesarEncrypt(inputText string, args []string) (string, error) {
-  n := 0; var err error
-  if (len(args) != 0){
-    n, err = strconv.Atoi(args[0])
-    check(err)
-  }
-  if (n==0){
-    return caesarShift(inputText, n), errors.New("no shift found. try `--cipher caesar 5`")
-  }
-  return caesarShift(inputText, n), err
-}
-
-func caesarDecrypt(inputText string, hint string) (string, error) {
-  switch hint {
-  case "print-all":
-    result := "\n"
-    i := 0
-    for (i < 26) {
-      result = result + caesarShift(inputText, i) + "\n"
-      i = i + 1
-    }
-    return result, nil
-  case "analysis":
-    return "working on it", nil
-  default:
-    return "", errors.New("no hint given. specify --hint print-all or --hint analyze")
-  }
-  return "", nil
 }
 
 func process(inputText string, world settings) (string, error) {

@@ -17,10 +17,10 @@
 ./crypt -i plain.txt -e -c caesar 5
 ```
 decoding could be performed 
- - with `--print-all` (which prints all 26)
+ - with `--brute-force` (which prints all 26)
  - or with default, `--dict-attack`
 ```
-./crypt -i plain.txt --decrypt --cipher caesar --print-all
+./crypt -i plain.txt --decrypt --cipher caesar --brute-force
 ./crypt -i plain.txt -d -c caesar --dict-attack
 ```
 
