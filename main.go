@@ -5,6 +5,9 @@ import "io/ioutil"
 import "strings"
 import "github.com/pborman/getopt" //https://godoc.org/github.com/pborman/getopt
 import "errors"
+import "os"
+import "text/tabwriter"
+
 
 type World struct {
   encrypting bool
@@ -43,33 +46,46 @@ func (w World) check() (bool, error) {
 }
 
 func (w World) print() {
+  p := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
   fmt.Println("")
-  fmt.Println("    cipher ::", w.cipher)
+
+  fmt.Fprintln(p, "Cipher \t", w.cipher)
 
   if w.encrypting {
-    fmt.Println("    status :: encrypting")
+    fmt.Fprintln(p,  "Status \t encrypting")
   } else if w.decrypting {
-    fmt.Println("    status :: decrypting")
+    fmt.Fprintln(p, "Status \t decrypting")
     if (w.hint != "") {
-      fmt.Println("      hint ::", w.hint)
+      fmt.Fprintln(p, "Hint \t", w.hint)
     }
   } else {
-    fmt.Println("    status :: neither encrypting nor decryptinng")
+    fmt.Fprintln(p, "Status \t neither encrypting nor decrypting")
   }
 
-  fmt.Println(" inputPath ::", w.inputPath)
+  fmt.Fprintln(p, "Input path \t", w.inputPath)
   if (w.existsOutputPath) {
-    fmt.Println("outputPath ::", w.outputPath)
+    fmt.Fprintln(p, "Output path \t", w.outputPath)
   }
 
-  fmt.Println(" inputText :: <", shorten(strings.TrimSpace(w.inputText)), ">")
-
-  if (w.existsOutputPath) {
-    fmt.Println("outputText :: printed to", w.outputPath)
+  if (w.encrypting) {
+    fmt.Fprintln(p, " Plaintext \t", shorten(strings.TrimSpace(w.inputText)))
   } else {
-    fmt.Println("outputText :: <", w.outputText, ">")
+    fmt.Fprintln(p, " Ciphertext \t", shorten(strings.TrimSpace(w.inputText)))
   }
 
+  
+  if (w.existsOutputPath) {
+    if (w.encrypting) {
+      fmt.Fprintln(p,  "Ciphertext \t printed to", w.outputPath)
+    } else { 
+      fmt.Fprintln(p,  "Plaintext \t printed to", w.outputPath)
+    }
+  }
+
+  p.Flush()
+  
+  fmt.Println("")
+  if (!w.existsOutputPath) { fmt.Println(w.outputText) }
   fmt.Println("")
 }
 

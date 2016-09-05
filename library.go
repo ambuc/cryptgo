@@ -4,6 +4,8 @@ import "fmt"
 import m "math"
 import "strings"
 import "regexp"
+import "os"
+import "text/tabwriter"
 
 func check(e error) {
   if e != nil {
@@ -11,7 +13,66 @@ func check(e error) {
   }
 }
 
+// STRING FUNCTIONS
 
+func strip(s string) string {
+  return regexp.MustCompile("[^a-zA-Z]").ReplaceAllString(s, "")
+}
+
+func shorten(s string) string {
+  result := regexp.MustCompile("\n").ReplaceAllString(s,"")
+  if(len(s) > 50){
+    return result[:45] + "..."
+  }
+  return result + "..."
+}
+
+func pure(input string) string {
+  return strings.ToLower(strip(input))
+}
+
+// FANCY STRING PRINTING
+
+func verboselyPrintByScore(poss map[int]float64, input string, decreasing bool){
+  p := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
+  if (decreasing) {
+    for {
+      if (len(poss) == 0) { break }
+      localMax := 0.0; localMaxKey := 0 
+      for k,v := range poss {
+        if v >= localMax {
+          localMax = v; localMaxKey = k
+        }
+      }
+      fmt.Fprintf(p, "+%v \t%3f \t %v\n", byte(localMaxKey), localMax, shorten(shiftWord(input, localMaxKey)))
+      delete(poss, localMaxKey)
+    }
+
+  } else {
+
+    for {
+      if (len(poss) == 0) { break }
+      localMin := 100.0; localMinKey := 0
+      for k,v := range poss {
+        if v <= localMin {
+          localMin = v; localMinKey = k
+        }
+      }
+      fmt.Fprintf(p, "+%v \t%3f \t %v\n", byte(localMinKey), localMin, shorten(shiftWord(input, localMinKey)))
+      delete(poss, localMinKey)
+    }
+  }
+
+  p.Flush()
+
+  if (decreasing) {
+    fmt.Printf("Scores ranked in decreasing order. (Lower is better)\n")
+  } else {
+    fmt.Printf("Scores ranked in increasing order. (Higher is better)\n")
+  }
+}
+
+// CRYPTOGRAPHIC FUNCTIONS
 
 func shiftChar(r rune, shift int) rune {
   //fmt.Println(string(r), r, int(r)+shift, string(int(r)+shift))
@@ -28,24 +89,7 @@ func shiftWord(inputText string, n int) string {
   return strings.Map( func (r rune) rune { return shiftChar(r, n) }, inputText)
 }
 
-func strip(s string) string {
-  return regexp.MustCompile("[^a-zA-Z]").ReplaceAllString(s, "")
-}
-
-func shorten(s string) string {
-  result := regexp.MustCompile("\n").ReplaceAllString(s,"")
-  if(len(s) > 50){
-    return result[:45] + "..."
-  }
-  return result + "..."
-}
-
-
-func pure(input string) string {
-  return strings.ToLower(strip(input))
-}
-
-func freq(input string) map[int]float64 {
+func frequencyMap(input string) map[int]float64 {
   testMap := make(map[int]float64)
   for _, c := range input {
     testMap[int(c)-97] = testMap[int(c)-97] + 1
@@ -56,7 +100,7 @@ func freq(input string) map[int]float64 {
   return testMap
 }
 
-func dist(a []float64, b []float64) float64 {
+func euclideanDistance(a []float64, b []float64) float64 {
   i := 0
   sum := 0.0
   for (i < len(a)) {
@@ -81,44 +125,22 @@ func english() map[int]float64 {
 }
 
 func frequencyAnalysis(input string, verbose bool) string {
-
-  cleanInput := pure(input)
-
-  engArr := mapToArray(english())
-
-  i := 0
   poss := map[int]float64{}
+  i := 0
   for (i < 26) {
-    shifted := shiftWord(cleanInput, i)
-    testArr := mapToArray(freq(shifted))
-    poss[i] = dist(engArr, testArr)
+    poss[i] = euclideanDistance( mapToArray( english()), mapToArray( frequencyMap( shiftWord(pure(input), i))))
     i = i + 1
   }
 
-  globalMin := 1000.0
-  bestKey := 0
+  globalMin := 1000.0; globalMinKey := 0
   for k, v := range poss {
     if (v < globalMin){
-      globalMin = v; bestKey = k
+      globalMin = v; globalMinKey = k
     }
   }
 
-  if (verbose) {
-    for {
-      if (len(poss) == 0) { break }
-      localMax := 0.0
-      localMaxKey := 0 
-      for k,v := range poss {
-        if v >= localMax {
-          localMax = v
-          localMaxKey = k
-        }
-      }
-      fmt.Printf(" %3f :: %v\n", localMax, shorten(shiftWord(input, localMaxKey)))
-      delete(poss, localMaxKey)
-    }
-    fmt.Printf("(lower is better)\n")
-  }
+  if (verbose) { verboselyPrintByScore(poss, input, true) }
 
-  return shiftWord(input, bestKey)
+  return shiftWord(input, globalMinKey)
 }
+
