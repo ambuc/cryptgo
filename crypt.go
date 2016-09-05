@@ -9,7 +9,7 @@ import "errors"
 type World struct {
   encrypting bool
   decrypting bool
-  
+
         inputPath string
   existsInputPath bool
         outputPath string

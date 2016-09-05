@@ -28,7 +28,7 @@ func caesarDecrypt(inputText string, hint string) (string, error) {
       return result, nil
 
     case "analyze":
-      return "working on it", nil
+      return frequencyAnalysis(inputText), nil
 
     default:
       return "", errors.New("no hint given. specify --hint brute-force or --hint analyze")
