@@ -3,87 +3,86 @@ package main
 import "fmt"
 import "io/ioutil"
 import "strings"
-import "github.com/pborman/getopt"
+import "github.com/pborman/getopt" //https://godoc.org/github.com/pborman/getopt
 import "errors"
 
-func check(e error) {
-  if e != nil {
-    panic(e)
-  } 
-}
-
-type settings struct {
+type World struct {
   encrypting bool
   decrypting bool
+  
+        inputPath string
   existsInputPath bool
+        outputPath string
   existsOutputPath bool
-  inputPath string
-  outputPath string
-  cipher string
+
+  inputText string
+  outputText string
+
+        cipher string
   existsCipher bool
-  args []string
+
   hint string
+  args []string
 }
 
-func checkWorld(world settings) (bool, error) {
-  if(!world.existsInputPath){
+func (w World) check() (bool, error) {
+  if(!w.existsInputPath){
     return false, errors.New("No input supplied. Try `... --inputpath /path/to/input.txt`")
   }
-  if(!world.encrypting && !world.decrypting){
+  if(!w.encrypting && !w.decrypting){
     return false, errors.New("Neither encrypting nor decrypting. Try --encrypt or --decrypt")
   }
-  if(world.encrypting && world.decrypting){
+  if(w.encrypting && w.decrypting){
     return false, errors.New("Both encrypting and decrypting. Try --encrypt or --decrypt")
   }
-  if(!world.existsCipher){
+  if(!w.existsCipher){
     return false, errors.New("No cipher defined. Try `... --cipher caesar`")
   }
 
   return true, nil
 }
 
-
-func printWorld(world settings, inputText string, outputText string) {
+func (w World) print() {
   fmt.Println("")
-  fmt.Println("    cipher ::", world.cipher)
+  fmt.Println("    cipher ::", w.cipher)
 
-  if world.encrypting {
+  if w.encrypting {
     fmt.Println("    status :: encrypting")
-  } else if world.decrypting {
+  } else if w.decrypting {
     fmt.Println("    status :: decrypting")
-    if (world.hint != "") {
-      fmt.Println("      hint ::", world.hint)
+    if (w.hint != "") {
+      fmt.Println("      hint ::", w.hint)
     }
   } else {
     fmt.Println("    status :: neither encrypting nor decryptinng")
   }
 
-  fmt.Println(" inputPath ::", world.inputPath)
-  if (world.existsOutputPath) {
-    fmt.Println("outputPath ::", world.outputPath)
+  fmt.Println(" inputPath ::", w.inputPath)
+  if (w.existsOutputPath) {
+    fmt.Println("outputPath ::", w.outputPath)
   }
 
-  fmt.Println(" inputText :: <", strings.TrimSpace(inputText), ">")
+  fmt.Println(" inputText :: <", strings.TrimSpace(w.inputText), ">")
 
-  if (world.existsOutputPath) {
-    fmt.Println("outputText :: printed to", world.outputPath)
+  if (w.existsOutputPath) {
+    fmt.Println("outputText :: printed to", w.outputPath)
   } else {
-    fmt.Println("outputText :: <", outputText, ">")
+    fmt.Println("outputText :: <", w.outputText, ">")
   }
 
   fmt.Println("")
 }
 
-func process(inputText string, world settings) (string, error) {
-  switch world.cipher {
-  case "caesar":
-    if (world.encrypting) {
-      return caesarEncrypt(inputText, world.args)
-    } else if (world.decrypting) {
-      return caesarDecrypt(inputText, world.hint)
-    }
-  default:
-    return "", errors.New("No cipher defined. Try --cipher caesar")
+func (w World) process() (string, error) {
+  switch w.cipher {
+    case "caesar":
+      if (w.encrypting) {
+        return caesarEncrypt(w.inputText, w.args)
+      } else if (w.decrypting) {
+        return caesarDecrypt(w.inputText, w.hint)
+      }
+    default:
+      return "", errors.New("No cipher defined. Try --cipher caesar")
   }
   return "", errors.New("No cipher defined. Try --cipher caesar")
 }
@@ -92,15 +91,16 @@ func main() {
 
   encryptingFlag := getopt.BoolLong("encrypt", 'e', "encrypting?")
   decryptingFlag := getopt.BoolLong("decrypt", 'd', "decrypting?")
-  quietFlag      := getopt.BoolLong("quiet", 'q', "quiet?")
   inputPath      := getopt.StringLong("inputpath", 'i', "", "path to input file")
   outputPath     := getopt.StringLong("outputpath",'o', "", "path to output file")
   cipherPtr      := getopt.StringLong("cipher", 'c', "", "which cipher to use")
   hintPtr        := getopt.StringLong("hint", 'h', "", "hint for the decrypter")
 
+  quietFlag      := getopt.BoolLong("quiet", 'q', "quiet?")
+
   getopt.Parse()
 
-  world                 := settings{}
+  world                 := World{}
   world.encrypting       = *encryptingFlag
   world.decrypting       = *decryptingFlag
   world.cipher           = *cipherPtr
@@ -112,29 +112,26 @@ func main() {
   world.hint             = *hintPtr
   world.args             = getopt.Args()
 
-  worldOk, err := checkWorld(world)
+  worldOk, err := world.check()
   check(err)
-  if(!worldOk){
-    return
-  }
+  if(!worldOk){ return }
 
   inputTextBytes, inputTextErr := ioutil.ReadFile(*inputPath)
   check(inputTextErr)
-  inputText := strings.TrimSpace(string(inputTextBytes))
+  world.inputText = strings.TrimSpace(string(inputTextBytes))
 
-  outputText, err := process(inputText, world)
+  world.outputText, err = world.process()
   check(err)
 
   if (!*quietFlag){
-    printWorld(world, inputText, outputText)
+    world.print()
+  } else {
+    fmt.Println(world.outputText)
   }
 
   if (world.existsOutputPath) {
-    err := ioutil.WriteFile(*outputPath, []byte(outputText), 0644)
+    err := ioutil.WriteFile(*outputPath, []byte(world.outputText), 0644)
     check(err)
   }
-
-  //fmt.Println("args:", getopt.Args())
-  //fmt.Println(reflect.TypeOf(getopt.Args()))
 
 }
