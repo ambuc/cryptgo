@@ -8,6 +8,10 @@ import "errors"
 import "os"
 import "text/tabwriter"
 
+type cipher interface {
+  encrypt() (string, error)
+  decrypt() (string, error)
+}
 
 type World struct {
   encrypting bool
@@ -50,64 +54,44 @@ func (w World) check() (bool, error) {
 
 func (w World) print() {
   p := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
-  fmt.Println("")
 
-  fmt.Fprintln(p, "Cipher \t", w.cipher)
-
+  var status, inputName, outputName string
   if w.encrypting {
-    fmt.Fprintln(p,  "Status \t encrypting")
-  } else if w.decrypting {
-    fmt.Fprintln(p, "Status \t decrypting")
-    if (w.hint != "") {
-      fmt.Fprintln(p, "Hint \t", w.hint)
-    }
+    status = "encrypting"; inputName = "Plaintext";  outputName = "Ciphertext"
   } else {
-    fmt.Fprintln(p, "Status \t neither encrypting nor decrypting")
+    status = "decrypting"; inputName = "Ciphertext"; outputName = "Plaintext"
   }
 
-  if (w.existsInputPath) {
-    fmt.Fprintln(p, "Input path \t", w.inputPath)
-  }
-  if (w.existsOutputPath) {
-    fmt.Fprintln(p, "Output path \t", w.outputPath)
-  }
-
-  if (w.encrypting) {
-    fmt.Fprintln(p, " Plaintext \t", shorten(strings.TrimSpace(w.input)))
-  } else {
-    fmt.Fprintln(p, " Ciphertext \t", shorten(strings.TrimSpace(w.input)))
-  }
-
-  
-  if (w.existsOutputPath) {
-    if (w.encrypting) {
-      fmt.Fprintln(p,  "Ciphertext \t", shorten(strings.TrimSpace(w.output)))
-    } else { 
-      fmt.Fprintln(p,  "Plaintext \t", shorten(strings.TrimSpace(w.output)))
-    }
-    fmt.Fprintln(p, "\t Printed to", w.outputPath)
-  }
-
+  fmt.Println("")
+    fmt.Fprintln(p, "Cipher \t", w.cipher)
+    fmt.Fprintln(p,  "Status \t", status)
+    if w.decrypting && w.hint != "" { fmt.Fprintln(p, "Hint \t", w.hint) }
+    if (w.existsInputPath) { fmt.Fprintln(p, "Input path \t", w.inputPath) }
+    if (w.existsOutputPath) { fmt.Fprintln(p, "Output path \t", w.outputPath) }
+    fmt.Fprintln(p, inputName, "\t", shorten(strings.TrimSpace(w.input)))
+    fmt.Fprintln(p, outputName, "\t", shorten(strings.TrimSpace(w.output)))
+    if (w.existsOutputPath) { fmt.Fprintln(p, "\t Printed to", w.outputPath) }
   p.Flush()
-  
-  if (!w.existsOutputPath) { 
-    fmt.Println("")
-    fmt.Println(w.output) 
-  }
+  if (!w.existsOutputPath) { fmt.Println("\n", w.output) }
   fmt.Println("")
 }
 
 func (w World) process() (string, error) {
+  var c cipher
+
   switch w.cipher {
-    case "caesar":
-      if (w.encrypting) {
-        return caesarEncrypt(w.input, w.n)
-      } else if (w.decrypting) {
-        return caesarDecrypt(w.input, w.hint)
-      }
+    case "caesar": c = caesar{input: w.input, n: w.n, hint: w.hint}
+    case "rot13":  c =  rot13{input: w.input}
     default:
       return "", errors.New("No cipher defined. Try --cipher caesar")
   }
+
+  if (w.encrypting) {
+    return c.encrypt()
+  } else if (w.decrypting) {
+    return c.decrypt()
+  }
+
   return "", errors.New("No cipher defined. Try --cipher caesar")
 }
 
@@ -121,7 +105,6 @@ func main() {
   cipherPtr      := getopt.StringLong("cipher", 'c', "", "Name of encryption/decryption method used.")
   hintPtr        := getopt.StringLong("hint", 'h', "", "Hint for the decrypter, varies across ciphers. (optional)")
   nPtr           := getopt.IntLong("num", 'n', 0, "Some ciphers require a shift by <n> characters.")
-
   quietFlag      := getopt.BoolLong("quiet", 'q', "Boolean, true if suppressing verbose output.")
 
   getopt.Parse()
@@ -129,31 +112,34 @@ func main() {
   world                 := World{}
   world.encrypting       = *encryptingFlag
   world.decrypting       = *decryptingFlag
-  world.cipher           = *cipherPtr
-  world.existsCipher     = (*cipherPtr != "")
   world.inputPath        = *inputPath
-  world.outputPath       = *outputPath
-  world.input            = *input
   world.existsInputPath  = (*inputPath != "")
+  world.outputPath       = *outputPath
   world.existsOutputPath = (*outputPath != "")
+  world.input            = *input
   world.existsInput      = (*input != "")
   world.hint             = *hintPtr
   world.n                = *nPtr
   world.args             = getopt.Args()
+  world.cipher           = *cipherPtr
+  world.existsCipher     = (*cipherPtr != "")
 
-  worldOk, err := world.check()
+  _, err := world.check()
   check(err)
-  if(!worldOk){ return }
 
   if(world.existsInputPath){
-    inputTextBytes, inputTextErr := ioutil.ReadFile(*inputPath)
+    inputTextBytes, inputTextErr := ioutil.ReadFile(world.inputPath)
     check(inputTextErr)
     world.input = strings.TrimSpace(string(inputTextBytes))
   }
-  
 
   world.output, err = world.process()
   check(err)
+
+  if (world.existsOutputPath) {
+    err := ioutil.WriteFile(world.outputPath, []byte(world.output), 0644)
+    check(err)
+  }
 
   if (!*quietFlag){
     world.print()
@@ -161,9 +147,5 @@ func main() {
     fmt.Println(world.output)
   }
 
-  if (world.existsOutputPath) {
-    err := ioutil.WriteFile(*outputPath, []byte(world.output), 0644)
-    check(err)
-  }
 
 }
