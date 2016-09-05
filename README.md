@@ -24,7 +24,19 @@ Options:
 ```
 Short forms are available for all flags, but we use long flags in the documentation below.
 
-##Caesar Cipher
+## Supported ciphers
+ - [x] [Caesar cipher](#caesar-cipher) `-c caesar`
+ - [ ] ROT13
+ - [ ] Substitution cipher
+ - [ ] Atbash cipher
+ - [ ] Affine cipher
+ - [ ] Rail Fence cipher
+ - [ ] Route cipher
+ - [ ] Vignere cipher
+ - [ ] Playfair cipher
+ - [ ] Hill cipher
+
+###Caesar cipher
 ####Encryption
 ```
  ./cryptgo --input plaintext --encrypt --cipher caesar --num 5
