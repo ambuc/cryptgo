@@ -26,7 +26,7 @@ Short forms are available for all flags, but we use long flags in the documentat
 
 ## Supported ciphers
  - [x] [Caesar cipher](#caesar-cipher) `-c caesar`
- - [ ] ROT13
+ - [x] [ROT13](#rot13-cipher) `-c rot13`
  - [ ] Substitution cipher
  - [ ] Atbash cipher
  - [ ] Affine cipher
@@ -40,18 +40,23 @@ Short forms are available for all flags, but we use long flags in the documentat
 ####Encryption
 ```
  ./cryptgo --input plaintext --encrypt --cipher caesar --num 5
- ./cryptgo --read input.txt  --encrypt --cipher caesar --num 5
+           --read input.txt
 ```
 ####Decryption
 ```
- ./cryptgo --input input.txt --decrypt --cipher caesar --hint brute-force
- ./cryptgo --input input.txt --decrypt --cipher caesar --hint analyze
- ./cryptgo --input input.txt --decrypt --cipher caesar --hint analyze-verbose
+ ./cryptgo --read input.txt --decrypt --cipher caesar --hint brute-force
+                                                      --hint analyze
+                                                      --hint analyze-verbose
 ```
  - The _brute force_ method simply prints all 26 options, unranked.
  - The _analyze_ method runs a simple frequency analysis against the sample (assuming english), and returns the best fit. 
  - The _analyze-verbose_ method returns the best fit to output, but prints all 26 ranked options to stdout.
 
+###ROT13 cipher
+```
+ ./cryptgo --read input.txt --encrypt --cipher rot13
+                            --decrypt
+```
 ##Installation
 ```
 git clone https://github.com/ambuc/cryptgo.git

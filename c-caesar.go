@@ -2,33 +2,30 @@ package main
 
 import "errors"
 
-func caesarEncrypt(inputText string, n int) (string, error) {
-  if (n==0) {
-    return shiftWord(inputText, n), errors.New("no shift found. try `--cipher caesar -n 5`")
-  }
-  return shiftWord(inputText, n), nil
+type caesar struct {
+  hint string
+  input string
+  n int
 }
 
-func caesarDecrypt(inputText string, hint string) (string, error) {
-  switch hint {
+func (c caesar) encrypt() (string, error) {
+  return shiftWord(c.input, c.n), nil
+}
 
+func (c caesar) decrypt() (string, error) {
+  switch c.hint {
     case "brute-force":
       result := "\n"
       i := 0
       for (i < 26) {
-        result = result + shiftWord(inputText, i) + "\n"
+        result = result + shiftWord(c.input, i) + "\n"
         i = i + 1
       }
       return result, nil
-
     case "analyze":
-      return frequencyAnalysis(inputText, false), nil
-
+      return frequencyAnalysis(c.input, false), nil
     case "analyze-verbose":
-      return frequencyAnalysis(inputText, true), nil
-
-    default:
-      return "", errors.New("no hint given. specify `--hint brute-force` or `--hint analyze` or `--hint analyize-verbose`")
+      return frequencyAnalysis(c.input, true), nil
   }
-  return "", nil
+  return "", errors.New("no hint given. specify `--hint brute-force` or `--hint analyze` or `--hint analyize-verbose`")
 }
