@@ -62,7 +62,7 @@ func (w World) print() {
     fmt.Println("outputPath ::", w.outputPath)
   }
 
-  fmt.Println(" inputText :: <", strings.TrimSpace(w.inputText), ">")
+  fmt.Println(" inputText :: <", shorten(strings.TrimSpace(w.inputText)), ">")
 
   if (w.existsOutputPath) {
     fmt.Println("outputText :: printed to", w.outputPath)

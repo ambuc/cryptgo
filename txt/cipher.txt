@@ -1,1 +1,9 @@
-Jklktj znk kgyz "cgrr" ul znk ?igyzrk!! ~
+// Uvu-HZJPP spalyhs. Nv zvbyjl pz BAM-8.
+n := 'Σ' // ybul afwl, hu hsphz mvy pua32, ovskz h bupjvkl jvkl wvpua.
+
+m := 3.14195 // msvha64, hu PLLL-754 64-ipa msvhapun wvpua ubtily.
+j := 3 + 4p  // jvtwsle128, ylwylzlualk pualyuhssf dpao adv msvha64'z.
+
+// chy zfuahe dpao pupaphspglyz.
+chy b bpua = 7 // Buzpnulk, iba ptwsltluahapvu klwluklua zpgl hz dpao pua.
+chy wp msvha32 = 22. / 7
