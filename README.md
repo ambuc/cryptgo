@@ -44,7 +44,7 @@ Short forms are available for all flags, but we use long flags in the documentat
 ```
 git clone https://github.com/ambuc/cryptgo.git
 cd cryptgo
-go build
+go build -o crypt *.go
 ./cryptgo ...
 ```
 
