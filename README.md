@@ -5,28 +5,36 @@
 ##Usage:
 
 ```
- ./cryptgo -i=input.txt (-o=output.txt) -e -c=caesar 5
-                                        -d
- ./cryptgo --inputpath=input.txt (--outputpath=output.txt) --encrypt --cipher=caesar 5
-                                                           --decrypt
+ ./cryptgo -r input.txt (-w output.txt) -e -c caesar -n 5
+                                        -d -c caesar -h analyze
+ ./cryptgo -i plaintext  -e -c caesar -n 5
+ ./cryptgo -i ciphertext -d -c caesar -h analyze
 
 Options:
-  -e --encrypt             Boolean, true if encrypting the input file.
-  -d --decrypt             Boolean, true if decrypting the input file.
-  -i --inputpath=<path>    Path to the input file.
-  -o --outputpath=<path>   Path to the output file. Output is printed to the shell
-                           by default, but can be directed into a file.
-  -h --hint=<hint>         Hint for the decrypter, varies across ciphers [optional]
-  -c --cipher=<cipher>     Name of encryption/decryption method used.
-               caesar <n>  Caesar ciphers require a shift on encryption.
+  -e --encrypt             Boolean, true if encrypting the input.
+  -d --decrypt             Boolean, true if decrypting the input.
+  -r --read=<path>         Path to input file.
+  -w --write=<path>        Output is printed to the shell by default, but can be directed. (optional)
+                           into an output file.
+  -i --input=<string>      Input as a string.
+  -h --hint=<string>       Hint for the decrypter, varies across ciphers. (optional)
+  -c --cipher=<string>     Name of encryption/decryption method used.
+  -n --num=<num>           Some ciphers require a shift by <n> characters
+  -q --quiet               Boolean, true if suppressing verbose output.
 ```
+Short forms are available for all flags, but we use long flags in the documentation below.
 
 ##Caesar Cipher
-Decryption has three hints available:
+####Encryption
 ```
- ./cryptgo --input input.txt --decrypt --cipher caesar 5 --hint brute-force
- ./cryptgo --input input.txt --decrypt --cipher caesar 5 --hint analyze
- ./cryptgo --input input.txt --decrypt --cipher caesar 5 --hint analyze-verbose
+ ./cryptgo --input plaintext --encrypt --cipher caesar --num 5
+ ./cryptgo --read input.txt  --encrypt --cipher caesar --num 5
+```
+####Decryption
+```
+ ./cryptgo --input input.txt --decrypt --cipher caesar --hint brute-force
+ ./cryptgo --input input.txt --decrypt --cipher caesar --hint analyze
+ ./cryptgo --input input.txt --decrypt --cipher caesar --hint analyze-verbose
 ```
  - The _brute force_ method simply prints all 26 options, unranked.
  - The _analyze_ method runs a simple frequency analysis against the sample (assuming english), and returns the best fit. 
