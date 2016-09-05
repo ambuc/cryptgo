@@ -75,7 +75,7 @@ func verboselyPrintByScore(poss map[int]float64, input string, decreasing bool){
 // CRYPTOGRAPHIC FUNCTIONS
 
 func shiftChar(r rune, shift int) rune {
-  //fmt.Println(string(r), r, int(r)+shift, string(int(r)+shift))
+  if (shift < 0) { shift = (shift + 26) % 26 }
   if( 65<=r && r<=90 ) {
     return rune((((int(r) - 65 ) + shift) % 26) + 65)
   }

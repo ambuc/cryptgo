@@ -1,18 +1,12 @@
 package main
 
-import "strconv"
 import "errors"
 
-func caesarEncrypt(inputText string, args []string) (string, error) {
-  n := 0; var err error
-  if (len(args) != 0){
-    n, err = strconv.Atoi(args[0])
-    check(err)
-  }
+func caesarEncrypt(inputText string, n int) (string, error) {
   if (n==0) {
-    return shiftWord(inputText, n), errors.New("no shift found. try `--cipher caesar 5`")
+    return shiftWord(inputText, n), errors.New("no shift found. try `--cipher caesar -n 5`")
   }
-  return shiftWord(inputText, n), err
+  return shiftWord(inputText, n), nil
 }
 
 func caesarDecrypt(inputText string, hint string) (string, error) {
@@ -34,7 +28,7 @@ func caesarDecrypt(inputText string, hint string) (string, error) {
       return frequencyAnalysis(inputText, true), nil
 
     default:
-      return "", errors.New("no hint given. specify --hint brute-force or --hint analyze or --hint analyize-verbose`")
+      return "", errors.New("no hint given. specify `--hint brute-force` or `--hint analyze` or `--hint analyize-verbose`")
   }
   return "", nil
 }
