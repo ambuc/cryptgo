@@ -37,16 +37,16 @@ type World struct {
 
 func (w World) check() (bool, error) {
   if(!w.existsInputPath && !w.existsInput){
-    return false, errors.New("No input supplied. Try `--inputpath <path>` or `--input <input>`")
+    return false, errors.New("No input supplied. \n       Try `--input <string>` or `--read <file>`.\n                `-i <string>`        `-r <file>`")
   }
   if(!w.encrypting && !w.decrypting){
-    return false, errors.New("Neither encrypting nor decrypting. Try --encrypt or --decrypt")
+    return false, errors.New("Neither encrypting nor decrypting. \n       Try `--encrypt` or `--decrypt`.\n            `-e`           `-d`")
   }
   if(w.encrypting && w.decrypting){
-    return false, errors.New("Both encrypting and decrypting. Try --encrypt or --decrypt")
+    return false, errors.New("Both encrypting and decrypting.")
   }
   if(!w.existsCipher){
-    return false, errors.New("No cipher defined. Try `--cipher caesar`")
+    return false, errors.New("No cipher defined. \n       Try `--cipher (caesar|atbash|rot13)`")
   }
 
   return true, nil
@@ -80,8 +80,9 @@ func (w World) process() (string, error) {
   var c cipher
 
   switch w.cipher {
-    case "caesar": c = caesar{input: w.input, n: w.n, hint: w.hint}
-    case "rot13":  c =  rot13{input: w.input}
+    case "caesar" : c = caesar{input: w.input, n: w.n, hint: w.hint}
+    case "rot13"  : c =  rot13{input: w.input}
+    case "atbash" : c = atbash{input: w.input}
     default:
       return "", errors.New("No cipher defined. Try --cipher caesar")
   }

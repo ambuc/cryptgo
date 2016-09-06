@@ -27,8 +27,8 @@ Short forms are available for all flags, but we use long flags in the documentat
 ## Supported ciphers
  - [x] [Caesar cipher](#caesar-cipher) `-c caesar`
  - [x] [ROT13](#rot13-cipher) `-c rot13`
+ - [x] [Atbash cipher](#atbash-cipher) `-c atbash`
  - [ ] Substitution cipher
- - [ ] Atbash cipher
  - [ ] Affine cipher
  - [ ] Rail Fence cipher
  - [ ] Route cipher
@@ -36,15 +36,11 @@ Short forms are available for all flags, but we use long flags in the documentat
  - [ ] Playfair cipher
  - [ ] Hill cipher
 
-###Caesar cipher
-####Encryption
+## Hinted encryption / decryption
+###[Caesar cipher](https://en.wikipedia.org/wiki/Caesar_cipher)
 ```
- ./cryptgo --input plaintext --encrypt --cipher caesar --num 5
-           --read input.txt
-```
-####Decryption
-```
- ./cryptgo --read input.txt --decrypt --cipher caesar --hint brute-force
+ ./cryptgo --read input.txt --encrypt --cipher caesar --num 5
+                            --decrypt --cipher caesar --hint brute-force
                                                       --hint analyze
                                                       --hint analyze-verbose
 ```
@@ -52,11 +48,18 @@ Short forms are available for all flags, but we use long flags in the documentat
  - The _analyze_ method runs a simple frequency analysis against the sample (assuming english), and returns the best fit. 
  - The _analyze-verbose_ method returns the best fit to output, but prints all 26 ranked options to stdout.
 
-###ROT13 cipher
-```
- ./cryptgo --read input.txt --encrypt --cipher rot13
-                            --decrypt
-```
+## Automatic encryption / decryption
+
+###[ROT13 cipher](https://en.wikipedia.org/wiki/ROT13)
+  ```
+   ./cryptgo --read input.txt --encrypt --cipher rot13
+                              --decrypt
+  ```
+###[Atbash cipher](https://en.wikipedia.org/wiki/Atbash)
+  ```
+   ./cryptgo --read input.txt --encrypt --cipher atbash
+                              --decrypt
+  ```
 ##Installation
 ```
 git clone https://github.com/ambuc/cryptgo.git
