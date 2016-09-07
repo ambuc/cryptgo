@@ -14,25 +14,27 @@ type cipher interface {
 }
 
 type World struct {
-  encrypting bool
-  decrypting bool
+        encrypting bool
+        decrypting bool
 
-        inputPath string
-  existsInputPath bool
+         inputPath string
+   existsInputPath bool
         outputPath string
   existsOutputPath bool
+             input string
+       existsInput bool
+            output string
+      existsOutput bool
+            cipher string
+      existsCipher bool
 
-        input string
-  existsInput bool
-       output string
- existsOutput bool
+              hint string
 
-        cipher string
-  existsCipher bool
+                 n int
+                 a int
+                 b int
 
-  hint string
-  n int
-  args []string
+              args []string
 }
 
 func (w World) check() (bool, error) {
@@ -80,11 +82,12 @@ func (w World) process() (string, error) {
   var c cipher
 
   switch w.cipher {
-    case "caesar" : c = caesar{input: w.input, n: w.n, hint: w.hint}
-    case "rot13"  : c =  rot13{input: w.input}
-    case "atbash" : c = atbash{input: w.input}
-    default:
-      return "", errors.New("No cipher defined. Try --cipher caesar")
+  case "caesar" : c = caesar{input: w.input, n: w.n, hint: w.hint}
+  case "rot13"  : c =  rot13{input: w.input}
+  case "atbash" : c = atbash{input: w.input}
+  case "affine" : c = affine{input: w.input, hint: w.hint, a: w.a, b: w.b}
+  default:
+    return "", errors.New("No cipher defined. Try --cipher caesar")
   }
 
   if (w.encrypting) {
@@ -106,6 +109,8 @@ func main() {
   cipherPtr      := getopt.StringLong("cipher", 'c', "", "Name of encryption/decryption method used.")
   hintPtr        := getopt.StringLong("hint", 'h', "", "Hint for the decrypter, varies across ciphers. (optional)")
   nPtr           := getopt.IntLong("num", 'n', 0, "Some ciphers require a shift by <n> characters.")
+  aPtr           := getopt.IntLong("a", 'a', 0, "Some ciphers require keys.")
+  bPtr           := getopt.IntLong("b", 'b', 0, "Some ciphers require keys.")
   quietFlag      := getopt.BoolLong("quiet", 'q', "Boolean, true if suppressing verbose output.")
 
   getopt.Parse()
@@ -121,6 +126,9 @@ func main() {
   world.existsInput      = (*input != "")
   world.hint             = *hintPtr
   world.n                = *nPtr
+  world.a                = *aPtr
+  world.b                = *bPtr
+  world.args             = getopt.Args()
   world.args             = getopt.Args()
   world.cipher           = *cipherPtr
   world.existsCipher     = (*cipherPtr != "")
