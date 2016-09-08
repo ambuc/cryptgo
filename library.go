@@ -13,6 +13,20 @@ func check(e error) {
   }
 }
 
+//euclidean algorithm for coprimity
+func GCDIterative(u, v int) bool {
+  var t int
+  for u > 0 {
+    if u < v {
+      t = u
+      u = v
+      v = t
+    }
+    u = u - v
+  }
+  return (v == 1)
+}
+
 //////////////////////
 // STRING FUNCTIONS //
 //////////////////////
@@ -99,6 +113,18 @@ func shiftChar(r rune, shift int) rune {
 // shifts an entire word by n characters
 func shiftWord(inputText string, n int) string {
   return strings.Map( func (r rune) rune { return shiftChar(r, n) }, inputText)
+}
+
+// return a * (r + b ) + c
+func affineShift(a int, b int, c int) func(r rune) rune {
+  return func(r rune) rune {
+    if( 65<=r && r<=90 ) {
+      return rune(((a*(int(r)-65+b)+c)%26+26)%26+65)
+    } else if( 97<=r && r<=122 ) {
+      return rune(((a*(int(r)-97+b)+c)%26+26)%26+97)
+    }
+    return r
+  }
 }
 
 // for use in the atbash cipher
