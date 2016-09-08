@@ -34,37 +34,33 @@ func (a affine) encrypt() (string, error) {
   if a.b == 0 {
     return "", errors.New("Insecure encryption: value <b> not nonzero")
   }
+  f := genShiftFunc(a.a, 0, a.b)
+  return strings.Map(f, a.input), nil
+}
 
   
-  return strings.Map(func(r rune) rune {
+// return a * (r + b ) + c
+func genShiftFunc(a int, b int, c int) func(r rune) rune {
+  return func(r rune) rune {
     if( 65<=r && r<=90 ) {
-      return rune((a.a*int(r-65)+a.b)%26+65)
-    }
-    if( 97<=r && r<=122 ) {
-      return rune((a.a*int(r-97)+a.b)%26+97)
+      return rune(((a*(int(r)-65+b)+c)%26+26)%26+65)
+    } else if( 97<=r && r<=122 ) {
+      return rune(((a*(int(r)-97+b)+c)%26+26)%26+97)
     }
     return r
-  }, a.input), nil
+  }
 }
 
 func (a affine) decrypt() (string, error) {
   switch a.hint{
   case "known":
     coprime := GCDIterative(26, a.a)
-    if !coprime {
-      return "", errors.New("Unreal decryption: value <a> not coprime to 26")
-    }
+    if !coprime { return "", errors.New("Unreal decryption: <a> not coprime to 26") }
     i := new(big.Int).ModInverse(big.NewInt(int64(a.a)), big.NewInt(26))
     j := int(i.Int64())
-    return strings.Map(func(r rune) rune {
-      if( 65<=r && r<=90 ) {
-        return rune(((j*(int(r)-65-a.b))%26+26)%26+65)
-      }
-      if( 97<=r && r<=122 ) {
-        return rune(((j*(int(r)-97-a.b))%26+26)%26+97)
-      }
-      return r
-    }, a.input), nil
+    f := genShiftFunc(j, -a.b, 0)
+    return strings.Map(f, a.input), nil
+
   case "analyze":
     return a.input, nil
   case "analyze-verbose":
