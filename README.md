@@ -58,6 +58,7 @@ Short forms are available for all flags, but we use long flags in the documentat
   - The _known_ method assumes prior knowledge of the keys.
   - The _analyze_ method applies [statistical cryptanalysis](http://practicalcryptography.com/cryptanalysis/stochastic-searching/cryptanalysis-affine-cipher/) to determine the best fit.
   - The _analyze-verbose_ method returns the best fit to output, and prints the top `n` best fits.
+
 ## Automatic encryption / decryption
 
 ###[ROT13 cipher](https://en.wikipedia.org/wiki/ROT13)
