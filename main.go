@@ -1,11 +1,11 @@
 package main
 
-import "fmt"
-import "io/ioutil"
-import "strings"
-import "github.com/pborman/getopt" //https://godoc.org/github.com/pborman/getopt
 import "errors"
+import "fmt"
+import "github.com/pborman/getopt" //https://godoc.org/github.com/pborman/getopt
+import "io/ioutil"
 import "os"
+import "strings"
 import "text/tabwriter"
 
 type cipher interface {
@@ -38,18 +38,6 @@ type World struct {
 }
 
 func (w World) check() (bool, error) {
-	if !w.existsInputPath && !w.existsInput {
-		return false, errors.New("No input supplied. \n       Try `--input <string>` or `--read <file>`.\n                `-i <string>`        `-r <file>`")
-	}
-	if !w.encrypting && !w.decrypting {
-		return false, errors.New("Neither encrypting nor decrypting. \n       Try `--encrypt` or `--decrypt`.\n            `-e`           `-d`")
-	}
-	if w.encrypting && w.decrypting {
-		return false, errors.New("Both encrypting and decrypting.")
-	}
-	if !w.existsCipher {
-		return false, errors.New("No cipher defined. \n       Try `--cipher (caesar|atbash|rot13)`")
-	}
 
 	return true, nil
 }
@@ -151,8 +139,18 @@ func main() {
 	world.cipher = *cipherPtr
 	world.existsCipher = (*cipherPtr != "")
 
-	_, err := world.check()
-	check(err)
+	if !world.existsInputPath && !world.existsInput {
+		panic(errors.New("No input supplied. \n       Try `--input <string>` or `--read <file>`.\n                `-i <string>`        `-r <file>`"))
+	}
+	if !world.encrypting && !world.decrypting {
+    panic(errors.New("Neither encrypting nor decrypting. \n       Try `--encrypt` or `--decrypt`.\n            `-e`           `-d`"))
+	}
+	if world.encrypting && world.decrypting {
+		panic(errors.New("Both encrypting and decrypting. \n       Try `--encrypt` or `--decrypt`.\n            `-e`           `-d`"))
+	}
+	if !world.existsCipher {
+		panic(errors.New("No cipher defined. \n       Try `--cipher (caesar|atbash|rot13)`"))
+	}
 
 	if world.existsInputPath {
 		inputTextBytes, inputTextErr := ioutil.ReadFile(world.inputPath)
@@ -160,11 +158,12 @@ func main() {
 		world.input = strings.TrimSpace(string(inputTextBytes))
 	}
 
-	world.output, err = world.process()
+  var err error
+  world.output, err = world.process()
 	check(err)
 
 	if world.existsOutputPath {
-		err := ioutil.WriteFile(world.outputPath, []byte(world.output), 0644)
+		err = ioutil.WriteFile(world.outputPath, []byte(world.output), 0644)
 		check(err)
 	}
 
