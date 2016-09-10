@@ -21,6 +21,7 @@ Options:
   -c --cipher=<string>     Name of encryption/decryption method used.
   -n --num=<num>           Some ciphers require a shift by <n> characters.
   -q --quiet               Boolean, true if suppressing verbose output.
+                           Useful for printing full output alone.
 ```
 Short forms are available for all flags, but we use long flags in the documentation below.
 
@@ -77,7 +78,7 @@ Short forms are available for all flags, but we use long flags in the documentat
 ```
 git clone https://github.com/ambuc/cryptgo.git
 cd cryptgo
-go build -o crypt *.go
+go build -o cryptgo *.go
 ./cryptgo ...
 ```
 
