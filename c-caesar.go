@@ -14,8 +14,8 @@ func (c caesar) encrypt() (string, error) {
 
 func (c caesar) decrypt() (string, error) {
 	switch c.hint {
-  case "known":
-    return shiftWord(c.input, -c.n), nil
+	case "known":
+		return shiftWord(c.input, -c.n), nil
 	case "brute-force":
 		result := "\n"
 		i := 0
