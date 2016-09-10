@@ -20,6 +20,7 @@ type World struct {
 	inputPath  string
 	outputPath string
 	input      string
+	output     string
 	cipher     string
 
 	hint string
@@ -105,24 +106,25 @@ func main() {
 	}
 
 	var err error
-	var output string
-	output, err = world.process()
+	world.output, err = world.process()
 	check(err)
 
 	if world.outputPath != "" {
-		err = ioutil.WriteFile(world.outputPath, []byte(output), 0644)
+		err = ioutil.WriteFile(world.outputPath, []byte(world.output), 0644)
 		check(err)
 	}
 
 	if !*quietFlag {
 
-		var status, inputName string
+		var status, inputName, outputName string
 		if world.encrypting {
 			status = "encrypting"
 			inputName = "Plaintext"
+			outputName = "Ciphertext"
 		} else {
 			status = "decrypting"
 			inputName = "Ciphertext"
+			outputName = "Plaintext"
 		}
 
 		fmt.Println("")
@@ -140,13 +142,15 @@ func main() {
 			fmt.Fprintln(p, "Output path \t", world.outputPath)
 		}
 		fmt.Fprintln(p, inputName, "\t", shorten(strings.TrimSpace(world.input)))
+		fmt.Fprintln(p, outputName, "\t", shorten(strings.TrimSpace(world.output)))
 		if world.outputPath != "" {
 			fmt.Fprintln(p, "\t Printed to", world.outputPath)
 		}
 		p.Flush()
 
 		fmt.Println("")
+	} else {
+		fmt.Println(world.output)
 	}
-	fmt.Println(output)
 
 }

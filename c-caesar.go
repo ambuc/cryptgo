@@ -1,6 +1,9 @@
 package main
 
 import "errors"
+import "fmt"
+import "os"
+import "text/tabwriter"
 
 type caesar struct {
 	hint  string
@@ -41,7 +44,7 @@ func caesarFrequencyAnalysis(input string, verbose bool) string {
 	poss := map[int]float64{}
 	i := 0
 	for i < 26 {
-		poss[i] = euclideanDistance(mapToArray(english()), mapToArray(caesarFrequencyMap(shiftWord(pure(input), i))))
+		poss[i] = euclideanDistance(mapToArray(english()), mapToArray(frequencyMap(shiftWord(pure(input), i))))
 		i = i + 1
 	}
 
@@ -55,20 +58,56 @@ func caesarFrequencyAnalysis(input string, verbose bool) string {
 	}
 
 	if verbose {
-		verboselyPrintByScore(poss, input, true)
+		caesarVerboselyPrintByScore(poss, input, true)
 	}
 
 	return shiftWord(input, globalMinKey)
 }
 
-//given an input, returns a map of characters (by int) and their frequencies (by float64)
-func caesarFrequencyMap(input string) map[int]float64 {
-	testMap := make(map[int]float64)
-	for _, c := range input {
-		testMap[int(c)-97] = testMap[int(c)-97] + 1
+// prints a given string at a list of [int] shifts, ranked by (float64)s in (in|de)creasing order
+func caesarVerboselyPrintByScore(poss map[int]float64, input string, decreasing bool) {
+	p := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	if decreasing {
+		for {
+			if len(poss) == 0 {
+				break
+			}
+			localMax := 0.0
+			localMaxKey := 0
+			for k, v := range poss {
+				if v >= localMax {
+					localMax = v
+					localMaxKey = k
+				}
+			}
+			fmt.Fprintf(p, "+%v \t%3f \t %v\n", byte(localMaxKey), localMax, shorten(shiftWord(input, localMaxKey)))
+			delete(poss, localMaxKey)
+		}
+
+	} else {
+
+		for {
+			if len(poss) == 0 {
+				break
+			}
+			localMin := 100.0
+			localMinKey := 0
+			for k, v := range poss {
+				if v <= localMin {
+					localMin = v
+					localMinKey = k
+				}
+			}
+			fmt.Fprintf(p, "+%v \t%3f \t %v\n", byte(localMinKey), localMin, shorten(shiftWord(input, localMinKey)))
+			delete(poss, localMinKey)
+		}
 	}
-	for k, _ := range testMap {
-		testMap[k] = testMap[k] / float64(len(input))
+
+	p.Flush()
+
+	if decreasing {
+		fmt.Printf("Scores ranked in decreasing order. (Lower is better)\n")
+	} else {
+		fmt.Printf("Scores ranked in increasing order. (Higher is better)\n")
 	}
-	return testMap
 }
