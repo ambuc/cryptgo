@@ -14,12 +14,12 @@ Options:
   -e --encrypt             Boolean, true if encrypting the input.
   -d --decrypt             Boolean, true if decrypting the input.
   -r --read=<path>         Path to input file.
-  -w --write=<path>        Output is printed to the shell by default, but can be directed. (optional)
+  -w --write=<path>        Output is printed to the shell by default, but can be directed
                            into an output file.
   -i --input=<string>      Input as a string.
-  -h --hint=<string>       Hint for the decrypter, varies across ciphers. (optional)
+  -h --hint=<string>       Hint for the decrypter, varies across ciphers.
   -c --cipher=<string>     Name of encryption/decryption method used.
-  -n --num=<num>           Some ciphers require a shift by <n> characters
+  -n --num=<num>           Some ciphers require a shift by <n> characters.
   -q --quiet               Boolean, true if suppressing verbose output.
 ```
 Short forms are available for all flags, but we use long flags in the documentation below.
@@ -28,8 +28,8 @@ Short forms are available for all flags, but we use long flags in the documentat
  - [x] [Caesar cipher](#caesar-cipher) `-c caesar`
  - [x] [ROT13](#rot13-cipher) `-c rot13`
  - [x] [Atbash cipher](#atbash-cipher) `-c atbash`
+ - [x] [Affine cipher](#affine-cipher) `-c affine`
  - [ ] Substitution cipher
- - [ ] [Affine cipher](#affine-cipher) `-c affine`
  - [ ] Rail Fence cipher
  - [ ] Route cipher
  - [ ] Vignere cipher
@@ -55,11 +55,11 @@ Short forms are available for all flags, but we use long flags in the documentat
    ./cryptgo --read input.txt --encrypt --cipher affine -a 5 -b 8
                               --decrypt --cipher affine --hint known -a 5 -b 8
                                                         --hint analyze
-                                                        --hint analyze-verbose -n 10
+                                                        --hint analyze-verbose
   ```
   - The _known_ method assumes prior knowledge of the keys.
   - The _analyze_ method applies [statistical cryptanalysis](http://practicalcryptography.com/cryptanalysis/stochastic-searching/cryptanalysis-affine-cipher/) to determine the best fit.
-  - The _analyze-verbose_ method returns the best fit to output, and prints the top `n` best fits.
+  - The _analyze-verbose_ method does the same as the _analyze_ method, but shows you a bit of the mathematics.
 
 ## Automatic encryption / decryption
 

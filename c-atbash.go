@@ -6,12 +6,12 @@ type atbash struct {
 	input string
 }
 
-func (a atbash) encrypt() (string, error) {
-	return strings.Map(atbashFlip, a.input), nil
+func (this atbash) encrypt() (string, error) {
+	return strings.Map(atbashFlip, this.input), nil
 }
 
-func (a atbash) decrypt() (string, error) {
-	return strings.Map(atbashFlip, a.input), nil
+func (this atbash) decrypt() (string, error) {
+	return strings.Map(atbashFlip, this.input), nil
 }
 
 ///////////////////////

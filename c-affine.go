@@ -2,8 +2,8 @@ package main
 
 import "fmt"
 import "errors"
-import "math/big"
 import "strings"
+import "sort"
 
 type affine struct {
 	hint  string
@@ -12,42 +12,79 @@ type affine struct {
 	b     int
 }
 
-func (a affine) encrypt() (string, error) {
-	if a.a <= 0 {
+func (this affine) encrypt() (string, error) {
+	if this.a <= 0 {
 		return "", errors.New("Insecure encryption: value <a> must be greater than zero")
 	}
-	if a.b <= 0 {
+	if this.b <= 0 {
 		return "", errors.New("Insecure encryption: value <b> must be greater than zero")
 	}
-	if !GCDIterative(26, a.a) {
+	if !GCDIterative(26, this.a) {
 		return "", errors.New("Insecure encryption: value <a> not coprime to 26")
 	}
-	return strings.Map(affineShift(a.a, 0, a.b), a.input), nil
+	return strings.Map(affineShift(this.a, 0, this.b), this.input), nil
 }
 
-func (a affine) decrypt() (string, error) {
-	switch a.hint {
+func (this affine) decrypt() (string, error) {
+	switch this.hint {
 	case "known":
-		if a.a <= 0 {
+		if this.a <= 0 {
 			return "", errors.New("Insecure encryption: value <a> must be greater than zero")
 		}
-		if a.b <= 0 {
+		if this.b <= 0 {
 			return "", errors.New("Insecure encryption: value <b> must be greater than zero")
 		}
-		if !GCDIterative(26, a.a) {
+		if !GCDIterative(26, this.a) {
 			return "", errors.New("Unreal decryption: <a> not coprime to 26")
 		}
-		j := int(new(big.Int).ModInverse(big.NewInt(int64(a.a)), big.NewInt(26)).Int64())
-		return strings.Map(affineShift(j, -a.b, 0), a.input), nil
+		return strings.Map(affineShift(affineModInverse(this.a), -this.b, 0), this.input), nil
 
 	case "analyze":
-		fmt.Print(a.input)
-		return a.input, nil
+		return affineAnalyze(this.input, false)
+
 	case "analyze-verbose":
-		return a.input, nil
+		return affineAnalyze(this.input, true)
 	}
 	return "", errors.New("no hint given. specify `--hint known` or `--hint analyze` or `--hint analyize-verbose`")
-	return a.input, nil
+	return this.input, nil
+}
+
+func affineAnalyze(input string, verbose bool) (string, error) {
+	m := frequencyMap(strings.ToLower(pure(input)))
+	mInv := make(map[float64]int)
+	var frequencies []float64
+	for letter, frequency := range m {
+		frequencies = append(frequencies, frequency)
+		mInv[frequency] = letter
+	}
+	sort.Sort(sort.Reverse(sort.Float64Slice(frequencies)))
+	p := 4                    //e
+	q := 19                   //t
+	r := mInv[frequencies[0]] //first most frequently occuring letter
+	s := mInv[frequencies[1]] //second most frequently occuring letter
+	D := ((p - q) + 26) % 26
+	Dinv := affineModInverse(D)
+	a := ((Dinv * (r - s) % 26) + 26) % 26
+	b := ((Dinv * (p*s - q*r) % 26) + 26) % 26
+	if verbose {
+		fmt.Println("")
+		fmt.Println("Two most frequent letters in English:")
+		fmt.Println("\t e #4  -> p = 4")
+		fmt.Println("\t t #19 -> q = 19")
+		fmt.Println("")
+		fmt.Println("Two most frequent letters in Ciphertext:")
+		fmt.Printf("\t %v #%v -> r = %v\n", string(rune(r+97)), r, r)
+		fmt.Printf("\t %v #%v -> s = %v\n", string(rune(s+97)), s, s)
+		fmt.Println("")
+		fmt.Println("Solving system of linear equations:")
+		fmt.Println("\t a x p + b = r")
+		fmt.Println("\t a x q + b = s")
+		fmt.Println("")
+		fmt.Println("Results:")
+		fmt.Printf("\t a = %v; b = %v", a, b)
+		fmt.Println("")
+	}
+	return strings.Map(affineShift(affineModInverse(a), -b, 0), input), nil
 }
 
 ///////////////////////
@@ -64,4 +101,16 @@ func affineShift(a int, b int, c int) func(r rune) rune {
 		}
 		return r
 	}
+}
+
+// returns multiplicative inverse mod 26
+func affineModInverse(a int) int {
+	for x := 1; x <= 25; x++ {
+		if (a*x)%26 == 1 {
+			return x
+		}
+	}
+	return 0
+	//import "math/big"
+	//return int(new(big.Int).ModInverse(big.NewInt(int64(a)), big.NewInt(26)).Int64())
 }
