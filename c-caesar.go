@@ -1,7 +1,6 @@
 package main
 
 import "errors"
-import m "math"
 
 type caesar struct {
 	hint  string
@@ -15,6 +14,8 @@ func (c caesar) encrypt() (string, error) {
 
 func (c caesar) decrypt() (string, error) {
 	switch c.hint {
+	case "known":
+		return shiftWord(c.input, -c.n), nil
 	case "brute-force":
 		result := "\n"
 		i := 0
@@ -40,7 +41,7 @@ func caesarFrequencyAnalysis(input string, verbose bool) string {
 	poss := map[int]float64{}
 	i := 0
 	for i < 26 {
-		poss[i] = euclideanDistance(mapToArray(english()), mapToArray(casearFrequencyMap(shiftWord(pure(input), i))))
+		poss[i] = euclideanDistance(mapToArray(english()), mapToArray(caesarFrequencyMap(shiftWord(pure(input), i))))
 		i = i + 1
 	}
 

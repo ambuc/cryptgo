@@ -5,7 +5,7 @@
 ##Usage:
 
 ```
- ./cryptgo -r input.txt (-w output.txt) -e -c caesar -n 5
+ ./cryptgo -r input.txt [-w output.txt] -e -c caesar -n 5
                                         -d -c caesar -h analyze
  ./cryptgo -i plaintext  -e -c caesar -n 5
  ./cryptgo -i ciphertext -d -c caesar -h analyze
@@ -41,10 +41,12 @@ Short forms are available for all flags, but we use long flags in the documentat
 ```
  ./cryptgo --read input.txt --encrypt --cipher caesar --num 5
                             --decrypt --cipher caesar --hint brute-force
+                                                      --hint known --num 5
                                                       --hint analyze
                                                       --hint analyze-verbose
 ```
  - The _brute force_ method simply prints all 26 options, unranked.
+ - The _known_ method is for decrypting a cipher with a known shift `<num>`.
  - The _analyze_ method runs a simple frequency analysis against the sample (assuming english), and returns the best fit. 
  - The _analyze-verbose_ method returns the best fit to output, but prints all 26 ranked options to stdout.
 

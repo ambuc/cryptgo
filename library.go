@@ -4,6 +4,7 @@ import "fmt"
 import "strings"
 import "regexp"
 import "os"
+import m "math"
 import "text/tabwriter"
 
 func check(e error) {
