@@ -11,26 +11,26 @@ type caesar struct {
 	n     int
 }
 
-func (c caesar) encrypt() (string, error) {
-	return shiftWord(c.input, c.n), nil
+func (this caesar) encrypt() (string, error) {
+	return shiftWord(this.input, this.n), nil
 }
 
-func (c caesar) decrypt() (string, error) {
-	switch c.hint {
+func (this caesar) decrypt() (string, error) {
+	switch this.hint {
 	case "known":
-		return shiftWord(c.input, -c.n), nil
+		return shiftWord(this.input, -this.n), nil
 	case "brute-force":
 		result := "\n"
 		i := 0
 		for i < 26 {
-			result = result + shiftWord(c.input, i) + "\n"
+			result = result + shiftWord(this.input, i) + "\n"
 			i = i + 1
 		}
 		return result, nil
 	case "analyze":
-		return caesarFrequencyAnalysis(c.input, false), nil
+		return caesarFrequencyAnalysis(this.input, false), nil
 	case "analyze-verbose":
-		return caesarFrequencyAnalysis(c.input, true), nil
+		return caesarFrequencyAnalysis(this.input, true), nil
 	}
 	return "", errors.New("no hint given. specify `--hint brute-force` or `--hint analyze` or `--hint analyize-verbose`")
 }
