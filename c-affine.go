@@ -49,3 +49,19 @@ func (a affine) decrypt() (string, error) {
 	return "", errors.New("no hint given. specify `--hint known` or `--hint analyze` or `--hint analyize-verbose`")
 	return a.input, nil
 }
+
+///////////////////////
+// LIBRARY FUNCTIONS //
+///////////////////////
+
+// return a * (r + b ) + c
+func affineShift(a int, b int, c int) func(r rune) rune {
+	return func(r rune) rune {
+		if 65 <= r && r <= 90 {
+			return rune(((a*(int(r)-65+b)+c)%26+26)%26 + 65)
+		} else if 97 <= r && r <= 122 {
+			return rune(((a*(int(r)-97+b)+c)%26+26)%26 + 97)
+		}
+		return r
+	}
+}
