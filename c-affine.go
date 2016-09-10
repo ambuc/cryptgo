@@ -46,7 +46,6 @@ func (this affine) decrypt() (string, error) {
 		return affineAnalyze(this.input, true)
 	}
 	return "", errors.New("no hint given. specify `--hint known` or `--hint analyze` or `--hint analyize-verbose`")
-	return this.input, nil
 }
 
 func affineAnalyze(input string, verbose bool) (string, error) {
