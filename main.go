@@ -18,15 +18,10 @@ type World struct {
 	decrypting bool
 
 	inputPath        string
-	existsInputPath  bool
 	outputPath       string
-	existsOutputPath bool
 	input            string
-	existsInput      bool
 	output           string
-	existsOutput     bool
 	cipher           string
-	existsCipher     bool
 
 	hint string
 
@@ -62,19 +57,19 @@ func (w World) print() {
 	if w.decrypting && w.hint != "" {
 		fmt.Fprintln(p, "Hint \t", w.hint)
 	}
-	if w.existsInputPath {
+	if w.inputPath != "" {
 		fmt.Fprintln(p, "Input path \t", w.inputPath)
 	}
-	if w.existsOutputPath {
+	if w.outputPath != "" {
 		fmt.Fprintln(p, "Output path \t", w.outputPath)
 	}
 	fmt.Fprintln(p, inputName, "\t", shorten(strings.TrimSpace(w.input)))
 	fmt.Fprintln(p, outputName, "\t", shorten(strings.TrimSpace(w.output)))
-	if w.existsOutputPath {
+	if w.outputPath != "" {
 		fmt.Fprintln(p, "\t Printed to", w.outputPath)
 	}
 	p.Flush()
-	if !w.existsOutputPath {
+	if w.outputPath == "" {
 		fmt.Println("\n", w.output)
 	}
 	fmt.Println("")
@@ -125,11 +120,8 @@ func main() {
 	world.encrypting = *encryptingFlag
 	world.decrypting = *decryptingFlag
 	world.inputPath = *inputPath
-	world.existsInputPath = (*inputPath != "")
 	world.outputPath = *outputPath
-	world.existsOutputPath = (*outputPath != "")
 	world.input = *input
-	world.existsInput = (*input != "")
 	world.hint = *hintPtr
 	world.n = *nPtr
 	world.a = *aPtr
@@ -137,9 +129,8 @@ func main() {
 	world.args = getopt.Args()
 	world.args = getopt.Args()
 	world.cipher = *cipherPtr
-	world.existsCipher = (*cipherPtr != "")
 
-	if !world.existsInputPath && !world.existsInput {
+	if world.inputPath == "" && world.input == "" {
 		panic(errors.New("No input supplied. \n       Try `--input <string>` or `--read <file>`.\n                `-i <string>`        `-r <file>`"))
 	}
 	if !world.encrypting && !world.decrypting {
@@ -148,11 +139,11 @@ func main() {
 	if world.encrypting && world.decrypting {
 		panic(errors.New("Both encrypting and decrypting. \n       Try `--encrypt` or `--decrypt`.\n            `-e`           `-d`"))
 	}
-	if !world.existsCipher {
+	if world.cipher == "" {
 		panic(errors.New("No cipher defined. \n       Try `--cipher (caesar|atbash|rot13)`"))
 	}
 
-	if world.existsInputPath {
+	if world.inputPath != "" {
 		inputTextBytes, inputTextErr := ioutil.ReadFile(world.inputPath)
 		check(inputTextErr)
 		world.input = strings.TrimSpace(string(inputTextBytes))
@@ -162,7 +153,7 @@ func main() {
   world.output, err = world.process()
 	check(err)
 
-	if world.existsOutputPath {
+	if world.outputPath != "" {
 		err = ioutil.WriteFile(world.outputPath, []byte(world.output), 0644)
 		check(err)
 	}
