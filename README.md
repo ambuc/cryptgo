@@ -29,7 +29,7 @@ Short forms are available for all flags, but we use long flags in the documentat
  - [x] [ROT13](#rot13-cipher) `-c rot13`
  - [x] [Atbash cipher](#atbash-cipher) `-c atbash`
  - [ ] Substitution cipher
- - [ ] Affine cipher
+ - [ ] [Affine cipher](#affine-cipher) `-c affine`
  - [ ] Rail Fence cipher
  - [ ] Route cipher
  - [ ] Vignere cipher
@@ -47,6 +47,17 @@ Short forms are available for all flags, but we use long flags in the documentat
  - The _brute force_ method simply prints all 26 options, unranked.
  - The _analyze_ method runs a simple frequency analysis against the sample (assuming english), and returns the best fit. 
  - The _analyze-verbose_ method returns the best fit to output, but prints all 26 ranked options to stdout.
+
+###[Affine cipher](https://en.wikipedia.org/wiki/Affine_cipher)
+  ```
+   ./cryptgo --read input.txt --encrypt --cipher affine -a 5 -b 8
+                              --decrypt --cipher affine --hint known -a 5 -b 8
+                                                        --hint analyze
+                                                        --hint analyze-verbose -n 10
+  ```
+  - The _known_ method assumes prior knowledge of the keys.
+  - The _analyze_ method applies [statistical cryptanalysis](http://practicalcryptography.com/cryptanalysis/stochastic-searching/cryptanalysis-affine-cipher/) to determine the best fit.
+  - The _analyze-verbose_ method returns the best fit to output, and prints the top `n` best fits.
 
 ## Automatic encryption / decryption
 
