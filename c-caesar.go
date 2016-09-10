@@ -5,7 +5,7 @@ import "errors"
 type caesar struct {
 	hint  string
 	input string
- 	n     int
+	n     int
 }
 
 func (c caesar) encrypt() (string, error) {

@@ -17,11 +17,10 @@ type World struct {
 	encrypting bool
 	decrypting bool
 
-	inputPath        string
-	outputPath       string
-	input            string
-	output           string
-	cipher           string
+	inputPath  string
+	outputPath string
+	input      string
+	cipher     string
 
 	hint string
 
@@ -30,49 +29,6 @@ type World struct {
 	b int
 
 	args []string
-}
-
-func (w World) check() (bool, error) {
-
-	return true, nil
-}
-
-func (w World) print() {
-	p := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
-
-	var status, inputName, outputName string
-	if w.encrypting {
-		status = "encrypting"
-		inputName = "Plaintext"
-		outputName = "Ciphertext"
-	} else {
-		status = "decrypting"
-		inputName = "Ciphertext"
-		outputName = "Plaintext"
-	}
-
-	fmt.Println("")
-	fmt.Fprintln(p, "Cipher \t", w.cipher)
-	fmt.Fprintln(p, "Status \t", status)
-	if w.decrypting && w.hint != "" {
-		fmt.Fprintln(p, "Hint \t", w.hint)
-	}
-	if w.inputPath != "" {
-		fmt.Fprintln(p, "Input path \t", w.inputPath)
-	}
-	if w.outputPath != "" {
-		fmt.Fprintln(p, "Output path \t", w.outputPath)
-	}
-	fmt.Fprintln(p, inputName, "\t", shorten(strings.TrimSpace(w.input)))
-	fmt.Fprintln(p, outputName, "\t", shorten(strings.TrimSpace(w.output)))
-	if w.outputPath != "" {
-		fmt.Fprintln(p, "\t Printed to", w.outputPath)
-	}
-	p.Flush()
-	if w.outputPath == "" {
-		fmt.Println("\n", w.output)
-	}
-	fmt.Println("")
 }
 
 func (w World) process() (string, error) {
@@ -127,14 +83,13 @@ func main() {
 	world.a = *aPtr
 	world.b = *bPtr
 	world.args = getopt.Args()
-	world.args = getopt.Args()
 	world.cipher = *cipherPtr
 
 	if world.inputPath == "" && world.input == "" {
 		panic(errors.New("No input supplied. \n       Try `--input <string>` or `--read <file>`.\n                `-i <string>`        `-r <file>`"))
 	}
 	if !world.encrypting && !world.decrypting {
-    panic(errors.New("Neither encrypting nor decrypting. \n       Try `--encrypt` or `--decrypt`.\n            `-e`           `-d`"))
+		panic(errors.New("Neither encrypting nor decrypting. \n       Try `--encrypt` or `--decrypt`.\n            `-e`           `-d`"))
 	}
 	if world.encrypting && world.decrypting {
 		panic(errors.New("Both encrypting and decrypting. \n       Try `--encrypt` or `--decrypt`.\n            `-e`           `-d`"))
@@ -149,19 +104,49 @@ func main() {
 		world.input = strings.TrimSpace(string(inputTextBytes))
 	}
 
-  var err error
-  world.output, err = world.process()
+	var err error
+	var output string
+	output, err = world.process()
 	check(err)
 
 	if world.outputPath != "" {
-		err = ioutil.WriteFile(world.outputPath, []byte(world.output), 0644)
+		err = ioutil.WriteFile(world.outputPath, []byte(output), 0644)
 		check(err)
 	}
 
 	if !*quietFlag {
-		world.print()
-	} else {
-		fmt.Println(world.output)
+
+		var status, inputName string
+		if world.encrypting {
+			status = "encrypting"
+			inputName = "Plaintext"
+		} else {
+			status = "decrypting"
+			inputName = "Ciphertext"
+		}
+
+		fmt.Println("")
+
+		p := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
+		fmt.Fprintln(p, "Cipher \t", world.cipher)
+		fmt.Fprintln(p, "Status \t", status)
+		if world.decrypting && world.hint != "" {
+			fmt.Fprintln(p, "Hint \t", world.hint)
+		}
+		if world.inputPath != "" {
+			fmt.Fprintln(p, "Input path \t", world.inputPath)
+		}
+		if world.outputPath != "" {
+			fmt.Fprintln(p, "Output path \t", world.outputPath)
+		}
+		fmt.Fprintln(p, inputName, "\t", shorten(strings.TrimSpace(world.input)))
+		if world.outputPath != "" {
+			fmt.Fprintln(p, "\t Printed to", world.outputPath)
+		}
+		p.Flush()
+
+		fmt.Println("")
 	}
+	fmt.Println(output)
 
 }
