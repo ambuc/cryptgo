@@ -66,10 +66,14 @@ Short forms are available for all flags, but we use long flags in the documentat
   ```
    ./cryptgo --read input.txt --encrypt --cipher substitution --key zebra
                               --decrypt --cipher substitution --hint known --key zebra
-                                                              --hint hill-climb
+                                                              --hint analyze
+                                                              --hint analyze -n 3000
+                                                              --hint analyze-verbose
+                                                              --hint analyze-verbose -n 3000
   ```
   - The _known_ method assumes prior knowledge of the key.
-  - The _hill-climb_ method attempts a simple [hill-climbing algorithm](https://en.wikipedia.org/wiki/Hill_climbing), as described [here](http://practicalcryptography.com/cryptanalysis/stochastic-searching/cryptanalysis-simple-substitution-cipher/).
+  - The _analyze_ method attempts a simple [hill-climbing algorithm](https://en.wikipedia.org/wiki/Hill_climbing), as described [here](http://practicalcryptography.com/cryptanalysis/stochastic-searching/cryptanalysis-simple-substitution-cipher/). Accepts `<n>`, a number of iterations to attempt, where the default number of iterations to attempt is 2000.
+  - The _analyze-verbose_ method does the same, but shows a rundown of the attempted keys and fitness scores.
 
 ## Automatic encryption / decryption
 

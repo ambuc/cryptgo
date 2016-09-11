@@ -46,7 +46,7 @@ func (w World) process() (string, error) {
 	case "affine":
 		c = affine{input: w.input, hint: w.hint, a: w.a, b: w.b}
 	case "substitution":
-		c = substitution{input: w.input, hint: w.hint, key: w.key}
+		c = substitution{input: w.input, hint: w.hint, key: w.key, n: w.n}
 	default:
 		return "", errors.New("No cipher defined. Try --cipher caesar")
 	}
