@@ -30,7 +30,7 @@ Short forms are available for all flags, but we use long flags in the documentat
  - [x] [ROT13](#rot13-cipher) `-c rot13`
  - [x] [Atbash cipher](#atbash-cipher) `-c atbash`
  - [x] [Affine cipher](#affine-cipher) `-c affine`
- - [ ] Substitution cipher
+ - [x] [Substitution cipher](#substitution-cipher) `-c substitution`
  - [ ] Rail Fence cipher
  - [ ] Route cipher
  - [ ] Vignere cipher
@@ -61,6 +61,15 @@ Short forms are available for all flags, but we use long flags in the documentat
   - The _known_ method assumes prior knowledge of the keys.
   - The _analyze_ method applies [statistical cryptanalysis](http://practicalcryptography.com/cryptanalysis/stochastic-searching/cryptanalysis-affine-cipher/) to determine the best fit.
   - The _analyze-verbose_ method does the same as the _analyze_ method, but shows you a bit of the mathematics.
+
+###[Substitution cipher](https://en.wikipedia.org/wiki/Substitution_cipher)
+  ```
+   ./cryptgo --read input.txt --encrypt --cipher substitution --key zebra
+                              --decrypt --cipher substitution --hint known --key zebra
+                                                              --hint hill-climb
+  ```
+  - The _known_ method assumes prior knowledge of the key.
+  - The _hill-climb_ method attempts a simple [hill-climbing algorithm](https://en.wikipedia.org/wiki/Hill_climbing), as described [here](http://practicalcryptography.com/cryptanalysis/stochastic-searching/cryptanalysis-simple-substitution-cipher/).
 
 ## Automatic encryption / decryption
 
