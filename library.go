@@ -1,8 +1,11 @@
 package main
 
-import "strings"
-import "regexp"
+import "bufio"
+import "os"
 import m "math"
+import "regexp"
+import "strconv"
+import "strings"
 
 func check(e error) {
 	if e != nil {
@@ -39,8 +42,20 @@ func euclideanDistance(a []float64, b []float64) float64 {
 	return m.Sqrt(sum)
 }
 
+///////////////////
+// MAP FUNCTIONS //
+///////////////////
+
+func invertRuneMap(m map[rune]rune) map[rune]rune {
+	n := make(map[rune]rune)
+	for k, v := range m {
+		n[v] = k
+	}
+	return n
+}
+
 //given a map of float64s, returns a list of values
-func mapToArray(input map[int]float64) []float64 {
+func getFloat64MapVals(input map[int]float64) []float64 {
 	vals := make([]float64, 0, 26)
 	i := 0
 	for i < 26 {
@@ -106,4 +121,34 @@ func shiftChar(r rune, shift int) rune {
 // shifts an entire word by n characters
 func shiftWord(inputText string, n int) string {
 	return strings.Map(func(r rune) rune { return shiftChar(r, n) }, inputText)
+}
+
+///////////////////
+// I/O FUNCTIONS //
+///////////////////
+
+func readLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
+}
+
+func readCorpus(path string) map[string]int {
+	lines, err := readLines(path)
+	check(err)
+	grams := make(map[string]int)
+	for _, line := range lines {
+		l := strings.Split(line, " ")
+		grams[l[0]], _ = strconv.Atoi(l[1])
+	}
+	return grams
 }

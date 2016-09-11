@@ -44,7 +44,7 @@ func caesarFrequencyAnalysis(input string, verbose bool) string {
 	poss := map[int]float64{}
 	i := 0
 	for i < 26 {
-		poss[i] = euclideanDistance(mapToArray(english()), mapToArray(frequencyMap(shiftWord(pure(input), i))))
+		poss[i] = euclideanDistance(getFloat64MapVals(english()), getFloat64MapVals(frequencyMap(shiftWord(pure(input), i))))
 		i = i + 1
 	}
 

@@ -24,6 +24,7 @@ type World struct {
 	cipher     string
 
 	hint string
+	key  string
 
 	n int
 	a int
@@ -44,6 +45,8 @@ func (w World) process() (string, error) {
 		c = atbash{input: w.input}
 	case "affine":
 		c = affine{input: w.input, hint: w.hint, a: w.a, b: w.b}
+	case "substitution":
+		c = substitution{input: w.input, hint: w.hint, key: w.key, n: w.n}
 	default:
 		return "", errors.New("No cipher defined. Try --cipher caesar")
 	}
@@ -66,6 +69,7 @@ func main() {
 	input := getopt.StringLong("input", 'i', "", "Input as a string.")
 	cipherPtr := getopt.StringLong("cipher", 'c', "", "Name of encryption/decryption method used.")
 	hintPtr := getopt.StringLong("hint", 'h', "", "Hint for the decrypter, varies across ciphers. (optional)")
+	keyPtr := getopt.StringLong("key", 'k', "", "Some ciphers require a passphrase or key.")
 	nPtr := getopt.IntLong("num", 'n', 0, "Some ciphers require a shift by <n> characters.")
 	aPtr := getopt.IntLong("a", 'a', 0, "Some ciphers require keys.")
 	bPtr := getopt.IntLong("b", 'b', 0, "Some ciphers require keys.")
@@ -80,6 +84,7 @@ func main() {
 	world.outputPath = *outputPath
 	world.input = *input
 	world.hint = *hintPtr
+	world.key = *keyPtr
 	world.n = *nPtr
 	world.a = *aPtr
 	world.b = *bPtr
@@ -134,6 +139,9 @@ func main() {
 		fmt.Fprintln(p, "Status \t", status)
 		if world.decrypting && world.hint != "" {
 			fmt.Fprintln(p, "Hint \t", world.hint)
+		}
+		if world.key != "" {
+			fmt.Fprintln(p, "Key \t", world.key)
 		}
 		if world.inputPath != "" {
 			fmt.Fprintln(p, "Input path \t", world.inputPath)
